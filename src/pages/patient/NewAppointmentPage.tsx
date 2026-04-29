@@ -19,7 +19,7 @@ import { useSimulatePayment } from "@/features/payments/usePayments";
 import type { Modality } from "@/types/api.types";
 
 const schema = z.object({
-  startsAt: z.string().min(1),
+  startsAt: z.string().min(1).refine((value) => !Number.isNaN(new Date(value).getTime()), "Fecha inválida"),
   durationMinutes: z.coerce.number().min(30),
   modality: z.enum(["VIRTUAL", "PRESENTIAL", "HYBRID"]),
 });
@@ -41,7 +41,12 @@ export function NewAppointmentPage() {
   const platformFee = price * 0.15;
 
   const onSubmit = async (values: Values) => {
-    const appointment = await appointments.create.mutateAsync({ ...values, psychologistId });
+    const appointment = await appointments.create.mutateAsync({
+      psychologistId,
+      scheduledAt: new Date(values.startsAt).toISOString(),
+      durationMinutes: values.durationMinutes,
+      modality: values.modality,
+    });
     await pay.mutateAsync(appointment.id);
     navigate(`/patient/appointments/${appointment.id}`);
   };

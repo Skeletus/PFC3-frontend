@@ -170,7 +170,7 @@ export interface AuthResponse {
 
 export interface CreateAppointmentPayload {
   psychologistId: string;
-  startsAt: string;
+  scheduledAt: string;
   durationMinutes: number;
   modality: Modality;
 }
